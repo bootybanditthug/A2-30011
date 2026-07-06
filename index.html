@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="refresh" content="3">
+  <title>Smart Lighting System</title>
+  <style>
+    body { font-family: Arial, sans-serif; background: #f4f6f8; margin: 0; padding: 0 0 40px; }
+    header { background: #6b84b8; color: white; padding: 20px; text-align: center; }
+    header h1 { margin: 0; font-size: 1.6em; }
+    main { max-width: 700px; margin: 20px auto; padding: 0 20px; }
+    h2 { border-bottom: 2px solid #ccc; padding-bottom: 8px; }
+    .stats { display: flex; justify-content: space-between; background: white; border-radius: 8px; padding: 20px; }
+    .stat { text-align: center; flex: 1; }
+    .stat .label { color: #666; font-size: 0.9em; }
+    .stat .value { font-size: 1.6em; font-weight: bold; color: #2b3a55; margin-top: 6px; }
+    .panel { background: white; border-radius: 8px; padding: 20px; margin-top: 20px; }
+    .panel label { display: block; margin-bottom: 6px; font-weight: bold; }
+    .panel input { width: 100%; padding: 8px; margin-bottom: 12px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 4px; }
+    button, input[type="submit"] {
+      background: #3b5aa9; color: white; border: none; border-radius: 4px;
+      padding: 12px 20px; font-size: 1em; cursor: pointer; width: 100%;
+    }
+    button:hover, input[type="submit"]:hover { background: #2e478a; }
+    .button-row { display: flex; gap: 12px; margin-top: 12px; }
+    .button-row form { flex: 1; margin: 0; }
+    form.inline { margin-bottom: 16px; }
+    table.analysis { width: 100%; border-collapse: collapse; }
+    table.analysis th, table.analysis td { text-align: center; padding: 8px; border-bottom: 1px solid #eee; }
+    table.analysis th { color: #666; font-weight: normal; font-size: 0.9em; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Smart Lighting System</h1>
+  </header>
+  <main>
+    <h2>Real-time Sensor Data</h2>
+    <div class="stats">
+      <div class="stat">
+        <div class="label">Light Level</div>
+        <div class="value">{{ data.light_level }}</div>
+      </div>
+      <div class="stat">
+        <div class="label">Distance</div>
+        <div class="value">{{ data.distance }} cm</div>
+      </div>
+      <div class="stat">
+        <div class="label">Light State</div>
+        <div class="value">{{ "ON" if data.light else "OFF" }}</div>
+      </div>
+      <div class="stat">
+        <div class="label">Mode</div>
+        <div class="value">{{ data.mode }}</div>
+      </div>
+    </div>
+
+    <h2>Control Panel</h2>
+    <div class="panel">
+      <form class="inline" action="{{ url_for('set_light_threshold') }}" method="post">
+        <label for="light_threshold">Set Light Threshold:</label>
+        <input type="number" id="light_threshold" name="light_threshold" min="0" max="1023" value="600">
+        <input type="submit" value="Set Light Threshold">
+      </form>
+
+      <form class="inline" action="{{ url_for('set_distance_threshold') }}" method="post">
+        <label for="distance_threshold">Set Distance Threshold (cm):</label>
+        <input type="number" id="distance_threshold" name="distance_threshold" min="0" max="400" value="30">
+        <input type="submit" value="Set Distance Threshold">
+      </form>
+
+      <div class="button-row">
+        <form action="{{ url_for('toggle_mode') }}" method="get">
+          <button type="submit">Toggle Mode</button>
+        </form>
+        <form action="{{ url_for('toggle_led') }}" method="get">
+          <button type="submit"{{ ' disabled' if data.mode == 'AUTO' else '' }}>Toggle LED</button>
+        </form>
+      </div>
+    </div>
+
+    <h2>Analysis (recent readings)</h2>
+    <div class="panel">
+      {% if data.analysis and data.analysis.avg_light is not none %}
+      <table class="analysis">
+        <tr>
+          <th></th>
+          <th>Light Level</th>
+          <th>Distance (cm)</th>
+        </tr>
+        <tr>
+          <td>Mean</td>
+          <td>{{ data.analysis.avg_light | round(1) }}</td>
+          <td>{{ data.analysis.avg_distance | round(1) }}</td>
+        </tr>
+        <tr>
+          <td>Min</td>
+          <td>{{ data.analysis.min_light }}</td>
+          <td>{{ data.analysis.min_distance }}</td>
+        </tr>
+        <tr>
+          <td>Max</td>
+          <td>{{ data.analysis.max_light }}</td>
+          <td>{{ data.analysis.max_distance }}</td>
+        </tr>
+      </table>
+      {% else %}
+      <p>Not enough data logged yet.</p>
+      {% endif %}
+    </div>
+  </main>
+</body>
+</html>
