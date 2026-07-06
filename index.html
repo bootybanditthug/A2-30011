@@ -2,112 +2,250 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <meta http-equiv="refresh" content="3">
   <title>Smart Lighting System</title>
   <style>
-    body { font-family: Arial, sans-serif; background: #f4f6f8; margin: 0; padding: 0 0 40px; }
-    header { background: #6b84b8; color: white; padding: 20px; text-align: center; }
-    header h1 { margin: 0; font-size: 1.6em; }
-    main { max-width: 700px; margin: 20px auto; padding: 0 20px; }
-    h2 { border-bottom: 2px solid #ccc; padding-bottom: 8px; }
-    .stats { display: flex; justify-content: space-between; background: white; border-radius: 8px; padding: 20px; }
-    .stat { text-align: center; flex: 1; }
-    .stat .label { color: #666; font-size: 0.9em; }
-    .stat .value { font-size: 1.6em; font-weight: bold; color: #2b3a55; margin-top: 6px; }
-    .panel { background: white; border-radius: 8px; padding: 20px; margin-top: 20px; }
-    .panel label { display: block; margin-bottom: 6px; font-weight: bold; }
-    .panel input { width: 100%; padding: 8px; margin-bottom: 12px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 4px; }
-    button, input[type="submit"] {
-      background: #3b5aa9; color: white; border: none; border-radius: 4px;
-      padding: 12px 20px; font-size: 1em; cursor: pointer; width: 100%;
+    :root {
+      --primary: #4361ee;
+      --primary-hover: #3a53cc;
+      --secondary: #f72585;
+      --bg-color: #f8f9fa;
+      --card-bg: #ffffff;
+      --text-main: #2b2d42;
+      --text-muted: #8d99ae;
     }
-    button:hover, input[type="submit"]:hover { background: #2e478a; }
-    .button-row { display: flex; gap: 12px; margin-top: 12px; }
+
+    body { 
+      font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; 
+      background: var(--bg-color); 
+      color: var(--text-main);
+      margin: 0; 
+      padding: 0 0 50px; 
+    }
+
+    header { 
+      background: linear-gradient(135deg, var(--primary), #3f37c9); 
+      color: white; 
+      padding: 25px 20px; 
+      text-align: center; 
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+
+    header h1 { margin: 0; font-size: 1.8em; font-weight: 600; letter-spacing: 0.5px; }
+
+    main { max-width: 800px; margin: 30px auto; padding: 0 20px; }
+
+    h2 { 
+      font-size: 1.2em; 
+      color: var(--text-muted); 
+      text-transform: uppercase; 
+      letter-spacing: 1px;
+      border-bottom: 2px solid #edf2f4; 
+      padding-bottom: 10px; 
+      margin-top: 30px;
+    }
+
+    .panel { 
+      background: var(--card-bg); 
+      border-radius: 12px; 
+      padding: 25px; 
+      box-shadow: 0 8px 20px rgba(0,0,0,0.04); 
+      margin-top: 15px; 
+    }
+
+    .stats { 
+      display: grid; 
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); 
+      gap: 15px; 
+    }
+
+    .stat { 
+      background: var(--card-bg); 
+      padding: 20px; 
+      border-radius: 12px; 
+      text-align: center;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.04);
+      border: 1px solid #f1f3f5;
+    }
+
+    .stat .label { color: var(--text-muted); font-size: 0.85em; font-weight: 600; text-transform: uppercase; }
+    .stat .value { font-size: 2em; font-weight: 700; color: var(--primary); margin-top: 8px; }
+
+    .panel label { display: block; margin-bottom: 8px; font-weight: 600; font-size: 0.95em; }
+    
+    .panel input[type="number"] { 
+      width: 100%; 
+      padding: 12px; 
+      margin-bottom: 15px; 
+      box-sizing: border-box; 
+      border: 1px solid #ced4da; 
+      border-radius: 6px; 
+      font-size: 1em;
+      transition: border-color 0.3s;
+    }
+
+    .panel input[type="number"]:focus {
+      outline: none;
+      border-color: var(--primary);
+    }
+
+    button, input[type="submit"] {
+      background: var(--primary); 
+      color: white; 
+      border: none; 
+      border-radius: 6px;
+      padding: 12px 20px; 
+      font-size: 1em; 
+      font-weight: 600;
+      cursor: pointer; 
+      width: 100%;
+      transition: all 0.2s ease;
+    }
+
+    button:hover, input[type="submit"]:hover { 
+      background: var(--primary-hover); 
+      transform: translateY(-1px);
+    }
+
+    button:disabled, input[type="submit"]:disabled {
+      background: #e9ecef;
+      color: #adb5bd;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .btn-warning { background-color: var(--secondary); }
+    .btn-warning:hover { background-color: #d81b60; }
+
+    .button-row { display: flex; gap: 15px; margin-top: 15px; }
     .button-row form { flex: 1; margin: 0; }
-    form.inline { margin-bottom: 16px; }
+    form.inline { margin-bottom: 25px; }
+
     table.analysis { width: 100%; border-collapse: collapse; }
-    table.analysis th, table.analysis td { text-align: center; padding: 8px; border-bottom: 1px solid #eee; }
-    table.analysis th { color: #666; font-weight: normal; font-size: 0.9em; }
+    table.analysis th, table.analysis td { text-align: center; padding: 12px; border-bottom: 1px solid #edf2f4; }
+    table.analysis th { color: var(--text-muted); font-weight: 600; font-size: 0.9em; text-transform: uppercase; }
+    table.analysis tr:last-child td { border-bottom: none; }
   </style>
 </head>
 <body>
   <header>
     <h1>Smart Lighting System</h1>
   </header>
+  
   <main>
     <h2>Real-time Sensor Data</h2>
     <div class="stats">
       <div class="stat">
         <div class="label">Light Level</div>
-        <div class="value">{{ data.light_level }}</div>
+        <div class="value" id="val-light">{{ data.light_level }}</div>
       </div>
       <div class="stat">
         <div class="label">Distance</div>
-        <div class="value">{{ data.distance }} cm</div>
+        <div class="value" id="val-dist">{{ data.distance }} cm</div>
       </div>
       <div class="stat">
         <div class="label">Light State</div>
-        <div class="value">{{ "ON" if data.light else "OFF" }}</div>
+        <div class="value" id="val-state">{{ "ON" if data.light else "OFF" }}</div>
       </div>
       <div class="stat">
         <div class="label">Mode</div>
-        <div class="value">{{ data.mode }}</div>
+        <div class="value" id="val-mode">{{ data.mode }}</div>
       </div>
     </div>
 
     <h2>Control Panel</h2>
     <div class="panel">
-      <form class="inline" action="{{ url_for('set_light_threshold') }}" method="post">
+      <form class="ajax-form inline" action="{{ url_for('set_light_threshold') }}" method="post">
         <label for="light_threshold">Set Light Threshold:</label>
         <input type="number" id="light_threshold" name="light_threshold" min="0" max="1023" value="600">
         <input type="submit" value="Set Light Threshold">
       </form>
 
-      <form class="inline" action="{{ url_for('set_distance_threshold') }}" method="post">
+      <form class="ajax-form inline" action="{{ url_for('set_distance_threshold') }}" method="post">
         <label for="distance_threshold">Set Distance Threshold (cm):</label>
         <input type="number" id="distance_threshold" name="distance_threshold" min="0" max="400" value="30">
         <input type="submit" value="Set Distance Threshold">
       </form>
 
       <div class="button-row">
-        <form action="{{ url_for('toggle_mode') }}" method="get">
-          <button type="submit">Toggle Mode</button>
+        <form class="ajax-form" action="{{ url_for('toggle_mode') }}" method="get">
+          <button type="submit" class="btn-warning">Toggle Mode</button>
         </form>
-        <form action="{{ url_for('toggle_led') }}" method="get">
-          <button type="submit"{{ ' disabled' if data.mode == 'AUTO' else '' }}>Toggle LED</button>
+        <form class="ajax-form" action="{{ url_for('toggle_led') }}" method="get">
+          <button type="submit" id="btn-toggle-led" {{ 'disabled' if data.mode == 'AUTO' else '' }}>Toggle LED</button>
         </form>
       </div>
     </div>
 
     <h2>Analysis (recent readings)</h2>
-    <div class="panel">
+    <div class="panel" id="analysis-container">
       {% if data.analysis and data.analysis.avg_light is not none %}
       <table class="analysis">
         <tr>
-          <th></th>
+          <th>Metric</th>
           <th>Light Level</th>
           <th>Distance (cm)</th>
         </tr>
         <tr>
-          <td>Mean</td>
+          <td><strong>Mean</strong></td>
           <td>{{ data.analysis.avg_light | round(1) }}</td>
           <td>{{ data.analysis.avg_distance | round(1) }}</td>
         </tr>
         <tr>
-          <td>Min</td>
+          <td><strong>Min</strong></td>
           <td>{{ data.analysis.min_light }}</td>
           <td>{{ data.analysis.min_distance }}</td>
         </tr>
         <tr>
-          <td>Max</td>
+          <td><strong>Max</strong></td>
           <td>{{ data.analysis.max_light }}</td>
           <td>{{ data.analysis.max_distance }}</td>
         </tr>
       </table>
       {% else %}
-      <p>Not enough data logged yet.</p>
+      <p style="color: #8d99ae; text-align: center;">Not enough data logged yet. Waiting for records...</p>
       {% endif %}
     </div>
   </main>
+
+  <script>
+    setInterval(async () => {
+      try {
+        const response = await fetch('/');
+        const html = await response.text();
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(html, 'text/html');
+
+        document.getElementById('val-light').innerText = doc.getElementById('val-light').innerText;
+        document.getElementById('val-dist').innerText = doc.getElementById('val-dist').innerText;
+        document.getElementById('val-state').innerText = doc.getElementById('val-state').innerText;
+        document.getElementById('val-mode').innerText = doc.getElementById('val-mode').innerText;
+
+        document.getElementById('btn-toggle-led').disabled = doc.getElementById('btn-toggle-led').disabled;
+
+        document.getElementById('analysis-container').innerHTML = doc.getElementById('analysis-container').innerHTML;
+      } catch (error) {
+        console.error('Error fetching real-time data:', error);
+      }
+    }, 1000); 
+
+    document.querySelectorAll('.ajax-form').forEach(form => {
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault(); 
+
+        const url = form.action;
+        const method = form.method;
+        const formData = new FormData(form);
+
+        try {
+          await fetch(url, {
+            method: method,
+            body: method.toUpperCase() === 'POST' ? formData : null
+          });
+        } catch (error) {
+          console.error('Error sending command:', error);
+        }
+      });
+    });
+  </script>
 </body>
 </html>
